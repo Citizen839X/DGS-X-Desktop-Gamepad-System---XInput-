@@ -69,26 +69,24 @@ The following devices have been manually tested and verified for full compatibil
 - **v1.5/2.0:** Implementation of a **Graphical User Interface (GUI)**.
 - **Custom Mapping:** A visual setup section to rebind keys without touching the code.
 - **Sensitivity Profiles:** Adjust movement speed and curves for the analog sticks via a dedicated slider.
-
 ## Screenshots & Integration
 
 DGS-X integrates seamlessly across different Linux desktop environments, appearing as a native system service.
 
 ### 🎮 Device Detection & Mapping
 <p align="center">
-  <img src="screenshots/sc_001.png" width="48%" alt="DGS-X Virtual Mouse in Input Remapper">
-  <img src="screenshots/sc_002.png" width="48%" alt="DGS-X Preset Editor">
+  <img src="screenshots/sc_001.png" width="45%" alt="DGS-X Virtual Mouse">
+  <img src="screenshots/sc_002.png" width="45%" alt="DGS-X Preset Editor">
 </p>
-<p align="center"><em>Left: DGS-X Virtual Mouse detected as a core system device. Right: Mapping logic for LT/RT and triggers.</em></p>
+<p align="center"><em>Left: DGS-X Virtual Mouse detected. Right: Mapping logic for LT/RT and triggers.</em></p>
 
 ### 🖥️ Desktop Environment Integration
 <p align="center">
-  <img src="screenshots/sc_003.png" width="31%" alt="DGS-X Service in XFCE Settings">
+  <img src="screenshots/sc_003.png" width="31%" alt="DGS-X Service in XFCE">
   <img src="screenshots/sc_004.jpg" width="31%" alt="DGS-X Notification on GNOME">
-  <img src="screenshots/sc_005.jpg" width="31%" alt="DGS-X in KDE Plasma App Dash">
+  <img src="screenshots/sc_005.jpg" width="31%" alt="DGS-X in KDE Plasma">
 </p>
-<p align="center"><em>1. XFCE Settings (Other category). 2. GNOME status notifications. 3. KDE Plasma application dashboard.</em></p>
-
+<p align="center"><em>1. XFCE Settings. 2. GNOME notifications. 3. KDE Plasma dashboard.</em></p>
 ---
 **Author:** Carlo Sitaro  
 **License:** GNU GPLv3
