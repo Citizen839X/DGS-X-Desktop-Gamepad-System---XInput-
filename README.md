@@ -5,7 +5,7 @@ DGS-X is a lightweight Linux utility designed to transform your XInput controlle
 
 ---
 
-## 🚀 Installation & Setup
+## 🚀 Installation
 
 DGS-X includes a universal installer that handles dependencies, creates a Python Virtual Environment (venv), and sets up the systemd user service.
 
