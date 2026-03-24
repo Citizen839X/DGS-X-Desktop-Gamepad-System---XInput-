@@ -5,6 +5,36 @@ DGS-X is a lightweight Linux utility designed to transform your XInput controlle
 
 ---
 
+## 🚀 Installation & Setup
+
+DGS-X includes a universal installer that handles dependencies, creates a Python Virtual Environment (venv), and sets up the systemd user service.
+
+1. **Clone the repository:**
+   ```bash
+   git clone [https://github.com/Citizen839X/DGS-X-Desktop-Gamepad-System---XInput-.git](https://github.com/Citizen839X/DGS-X-Desktop-Gamepad-System---XInput-.git)
+   cd DGS-X-Desktop-Gamepad-System---XInput-
+
+2. **Grant execution permissions:**
+    ```bash
+    chmod +x install.sh
+
+3. **Run the installer:**
+    ```bash
+    ./install.sh
+
+4. **Reload your session:**
+    Log out and log back in (or run newgrp input) to apply the necessary UDEV permissions for your controller.
+
+## 🛠️ Requirements
+
+    Python 3.x
+
+    evdev (installed automatically via venv)
+
+    XInput Controller (Xbox, PDP, or compatible)
+
+    systemd (for the auto-start service)
+
 ## 🎮 Default Key Mapping (v1.0)
 
 | Controller Input | Desktop Action |
@@ -83,5 +113,5 @@ DGS-X integrates seamlessly across different Linux desktop environments, appeari
 | *XFCE System Category* | *Status Notifications* | *Application Dashboard* |
 
 ---
-**Author:** Carlo Sitaro  
+**Author:** Carlo Sitaro
 **License:** GNU GPLv3
