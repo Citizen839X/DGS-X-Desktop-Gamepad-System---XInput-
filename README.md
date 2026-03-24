@@ -75,21 +75,6 @@ The following devices have been manually tested and verified for full compatibil
 DGS-X integrates seamlessly across different Linux desktop environments, appearing as a native system service.
 
 ### 🎮 Device Detection & Mapping
-<p align="center">
-  <img src="screenshots/sc_001.png" width="48%" alt="DGS-X Virtual Mouse in Input Remapper">
-  <img src="screenshots/sc_002.png" width="48%" alt="DGS-X Preset Editor">
-</p>
-<p align="center"><em>Left: DGS-X Virtual Mouse detected as a core system device. Right: Mapping logic for LT/RT and triggers.</em></p>
-
-## Screenshots & Integration
-
-DGS-X integrates seamlessly across different Linux desktop environments, appearing as a native system service.
-
-## Screenshots & Integration
-
-DGS-X integrates seamlessly across different Linux desktop environments, appearing as a native system service.
-
-### 🎮 Device Detection & Mapping
 
 | Virtual Device Detection | Preset Editor & Mapping |
 | :---: | :---: |
@@ -102,10 +87,6 @@ DGS-X integrates seamlessly across different Linux desktop environments, appeari
 | :---: | :---: | :---: |
 | ![XFCE](screenshots/sc_003.png) | ![GNOME](screenshots/sc_004.jpg) | ![KDE](screenshots/sc_005.jpg) |
 | *XFCE System Category* | *Status Notifications* | *Application Dashboard* |
-
----
-**Author:** Carlo Sitaro  
-**License:** GNU GPLv3
 
 ---
 **Author:** Carlo Sitaro  
