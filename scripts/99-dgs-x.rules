@@ -1,0 +1,7 @@
+# Allow users in the 'input' group to access uinput
+KERNEL=="uinput", GROUP="input", MODE="0660"
+
+# Grant access to XInput/PDP event devices
+KERNEL=="event*", ATTRS{name}=="*Xbox*", GROUP="input", MODE="0660"
+KERNEL=="event*", ATTRS{name}=="*PDP*", GROUP="input", MODE="0660"
+KERNEL=="event*", ATTRS{name}=="*Microsoft*", GROUP="input", MODE="0660"
