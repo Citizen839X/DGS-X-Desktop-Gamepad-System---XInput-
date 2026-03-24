@@ -85,7 +85,7 @@ DGS-X integrates seamlessly across different Linux desktop environments, appeari
 
 | XFCE Settings | GNOME Notifications | KDE Plasma Dash |
 | :---: | :---: | :---: |
-| ![XFCE](screenshots/sc_003.png) | ![GNOME](screenshots/sc_004.jpg) | ![KDE](screenshots/sc_005.jpg) |
+| ![XFCE](screenshots/sc_003.png) | ![GNOME](screenshots/sc_004.png) | ![KDE](screenshots/sc_005.png) |
 | *XFCE System Category* | *Status Notifications* | *Application Dashboard* |
 
 ---
