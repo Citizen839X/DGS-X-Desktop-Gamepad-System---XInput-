@@ -64,12 +64,6 @@ The following devices have been manually tested and verified for full compatibil
 
 > **Note on PDP Controllers:** While wired, these units offer superior durability feedback and were the main focus development target for DGS-X. However, you can use the original gamepad as well and the right stick sensitiveness basics may logically differ.
 
-## 🚀 Roadmap
-
-- **v1.5/2.0:** Implementation of a **Graphical User Interface (GUI)**.
-- **Custom Mapping:** A visual setup section to rebind keys without touching the code.
-- **Sensitivity Profiles:** Adjust movement speed and curves for the analog sticks via a dedicated slider.
-
 ## Screenshots & Integration
 
 DGS-X integrates seamlessly across different Linux desktop environments, appearing as a native system service.
