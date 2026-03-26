@@ -3,6 +3,18 @@
 
 DGS-X is a lightweight Linux utility designed to transform your XInput controller (specifically tested by myself on PDP Series S/X and original Xbox One S/X models) into a fully functional desktop navigation tool. It eliminates the need for a mouse by mapping common desktop actions directly to your gamepad. It is the ideal solution for anyone who wants to navigate the web with a comfortable Xbox controller—or compatible ones—straight from a comfy couch, right towards their favorite Linux Multimedia System.
 
+**Version 1.1 - Stable Release (what's new)**
+
+1 - Brilliant Analog Scrolling: Introduced a new time-based scrolling engine (10ms polling). This provides a smooth, "viscous" feel that scales exponentially with stick displacement, moving away from discrete event triggers for a truly organic experience.
+
+2 - JSON Configuration Engine: Settings are now decoupled from the core logic and stored in ~/.config/dgs-x/config.json. This ensures user preferences (like scroll inversion) persist across updates and reboots for the upcoming Control Panel.
+
+3 - Expanded Hardware Compatibility: Improved device discovery logic to automatically support a wider range of third-party XInput controllers and generic game pads, particularly with the IDs titling "generic".
+
+4 - Performance Optimization: Mouse movement and scrolling logic are now synchronized within a high-priority independent thread, significantly reducing input latency.
+
+5 - Refined Constants: Pointer sensitivity is now locked at the "Gold Standard" of 25 for maximum precision, while scroll resolution has been increased for better web navigation.
+
 ---
 
 ## 🚀 Installation
