@@ -1,5 +1,5 @@
 # =================================================================
-# DGS-X - 1.0 (Stable Release)
+# DGS-X - 1.1 (JSON INTEGRATION + IMPROVED SCROLL)
 # =================================================================
 # Copyright (C) 2026 Carlo Sitaro
 # Licensed under GNU GPLv3
@@ -14,19 +14,42 @@ import threading
 import os
 import socket
 import sys
+import json
 
-# --- SINGLE INSTANCE LOCK ---
-try:
-    lock_socket = socket.socket(socket.AF_UNIX, socket.SOCK_STREAM)
-    lock_socket.bind('\0dgs_x_lock_v1')
-except socket.error:
-    print("DGS-X is already running. Exiting.")
-    sys.exit(0)
+# --- CONFIGURATION LOGIC ---
+CONFIG_PATH = os.path.expanduser("~/.config/dgs-x/config.json")
 
-# --- CONFIGURATION ---
-SENSITIVITY = 25
-DEADZONE = 2000 
-ACCEL_CURVE = 1.8
+def load_settings():
+    # Mouse sensitivity is kept at 25 as the gold standard
+    defaults = {
+        "mouse_sensitivity": 25,
+        "scroll_sensitivity": 0.15,
+        "invert_scroll": False,
+        "deadzone": 2000,
+        "accel_curve": 1.8
+    }
+    try:
+        if os.path.exists(CONFIG_PATH):
+            with open(CONFIG_PATH, "r") as f:
+                return {**defaults, **json.load(f)}
+        else:
+            os.makedirs(os.path.dirname(CONFIG_PATH), exist_ok=True)
+            with open(CONFIG_PATH, "w") as f:
+                json.dump(defaults, f, indent=4)
+            return defaults
+    except Exception:
+        return defaults
+
+# Apply settings from JSON
+settings = load_settings()
+MOUSE_SENSITIVITY = settings["mouse_sensitivity"]
+SCROLL_SENSITIVITY = 0.5  # Increased for higher resolution
+SCROLL_CURVE = 2.0        # Exponential curve for organic feel
+INVERT_SCROLL = settings["invert_scroll"]
+DEADZONE = settings["deadzone"]
+ACCEL_CURVE = settings["accel_curve"]
+
+# Operational Constants
 TOGGLE_DELAY = 3.0
 TRIGGER_THRESHOLD = 500
 
@@ -34,7 +57,8 @@ state = {
     "rx": 0, "ry": 0, 
     "active": True, 
     "lt_clicked": False, "rt_clicked": False,
-    "scroll_acc": 0.0
+    "scroll_acc": 0.0,
+    "scroll_speed": 0.0    # New variable for inertial velocity
 }
 
 def get_xinput_device():
@@ -42,7 +66,7 @@ def get_xinput_device():
         devices = [evdev.InputDevice(path) for path in evdev.list_devices()]
         for dev in devices:
             name = dev.name.lower()
-            if any(x in name for x in ["xbox", "pdp", "microsoft", "x-box"]):
+            if any(x in name for x in ["xbox", "pdp", "microsoft", "x-box", "controller", "gamepad", "generic"]):
                 return dev
     except:
         pass
@@ -51,18 +75,28 @@ def get_xinput_device():
 def apply_accel(value):
     if abs(value) < DEADZONE: return 0
     norm = (abs(value) - DEADZONE) / (32767 - DEADZONE)
-    speed = (norm ** ACCEL_CURVE) * SENSITIVITY
+    speed = (norm ** ACCEL_CURVE) * MOUSE_SENSITIVITY
     return int(speed if value > 0 else -speed)
 
 def move_loop(ui):
-    """Independent thread for smooth mouse movement"""
+    """Independent thread for smooth mouse and scroll movement"""
     while True:
         if state["active"]:
+            # Mouse movement logic
             dx, dy = apply_accel(state["rx"]), apply_accel(state["ry"])
             if dx != 0 or dy != 0:
                 ui.write(e.EV_REL, e.REL_X, dx)
                 ui.write(e.EV_REL, e.REL_Y, dy)
-                ui.syn()
+            
+            # Brilliant Scroll Logic: Processed in the time loop for fluidity
+            if abs(state["scroll_speed"]) > 0.01:
+                state["scroll_acc"] += state["scroll_speed"]
+                if abs(state["scroll_acc"]) >= 1.0:
+                    steps = int(state["scroll_acc"])
+                    ui.write(e.EV_REL, e.REL_WHEEL, steps)
+                    state["scroll_acc"] -= steps
+            
+            ui.syn()
         time.sleep(0.01)
 
 def input_listener(device, ui):
@@ -82,22 +116,24 @@ def input_listener(device, ui):
         if not state["active"]: continue
 
         if event.type == e.EV_ABS:
-            # Analog Stick - Mouse Movement
+            # Right Stick - Mouse Movement
             if event.code == e.ABS_RX: state["rx"] = event.value
             elif event.code == e.ABS_RY: state["ry"] = event.value
             
-            # Left Stick - Vertical Scroll (Standard axes only)
+            # Left Stick - Vertical Scroll logic (Velocity based)
             elif event.code in [e.ABS_Y, e.ABS_HAT0Y]: 
                 if abs(event.value) > DEADZONE:
                     norm = (abs(event.value) - DEADZONE) / (32767 - DEADZONE)
-                    scale = 0.15 if event.code == e.ABS_Y else 0.5 
-                    state["scroll_acc"] += ((norm ** 1.5) * scale * (-1 if event.value < 0 else 1))
-                    if abs(state["scroll_acc"]) >= 1.0:
-                        steps = int(state["scroll_acc"])
-                        ui.write(e.EV_REL, e.REL_WHEEL, steps)
-                        ui.syn()
-                        state["scroll_acc"] -= steps
+                    
+                    direction = -1 if event.value < 0 else 1
+                    if INVERT_SCROLL:
+                        direction *= -1
+                    
+                    # D-Pad (HAT) gets a fixed comfortable speed, Stick gets analog curve
+                    input_scale = SCROLL_SENSITIVITY if event.code == e.ABS_Y else 0.4
+                    state["scroll_speed"] = (norm ** SCROLL_CURVE) * input_scale * direction
                 else: 
+                    state["scroll_speed"] = 0.0
                     state["scroll_acc"] = 0.0
             
             # LT -> MOUSE RIGHT CLICK
@@ -133,7 +169,7 @@ def main():
     }
     ui = UInput(cap, name="DGS-X Virtual Mouse")
 
-    # Mouse thread for smooth movement
+    # Start independent movement thread
     threading.Thread(target=move_loop, args=(ui,), daemon=True).start()
     input_listener(device, ui)
 
