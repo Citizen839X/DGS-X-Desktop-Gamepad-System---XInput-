@@ -3,6 +3,23 @@
 
 DGS-X is a lightweight Linux utility designed to transform your XInput controller (specifically tested by myself on PDP Series S/X and original Xbox One S/X models) into a fully functional desktop navigation tool. It eliminates the need for a mouse by mapping common desktop actions directly to your gamepad. It is the ideal solution for anyone who wants to navigate the web with a comfortable Xbox controller—or compatible ones—straight from a comfy couch, right towards their favorite Linux Multimedia System.
 
+**Version 1.2 - Stable Release (what's new)**
+
+1. Hardened Service Lock: The 3-second **START** button toggle is now prioritized over all other inputs. Even if the mouse logic is locked, the driver remains responsive to the wake-up command.
+
+2. System Notifications: Added native desktop notifications via `notify-send` to confirm `ENABLED` or `LOCKED` status.
+
+3. Xbox-Inspired UI: Updated Control Panel (480x620) featuring **Xbox Green** (`#107C10`) accents and Helvetica 11 Bold typography.
+
+4. Adaptive Theme Engine: The GUI now auto-detects system luminance to match your GTK Light or Dark theme colors.
+
+5. Integrated Left Stick Options: Added **Invert Y-Axis (Reverse Scrolling)** and **Ultra-Precision Mode** directly under the Left Stick block for better logical grouping.
+
+### 🛠 Fixes & Internal Improvements
+* **Single Instance Protection**: Implemented a socket-based lock (port 65432) to prevent multiple driver instances and allow remote wakeup from the application menu.
+* **Dependency Fix**: Resolved a critical regression by properly importing `subprocess` for system calls.
+* **Input Clean-up**: Optimized the `evdev` loop to ensure zero-latency when switching between scrolling and cursor movement.
+
 **Version 1.1 - Stable Release (what's new)**
 
 1 - Brilliant Analog Scrolling: Introduced a new time-based scrolling engine (10ms polling). This provides a smooth, "viscous" feel that scales exponentially with stick displacement, moving away from discrete event triggers for a truly organic experience.
