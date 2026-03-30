@@ -136,10 +136,10 @@ DGS-X integrates seamlessly across different Linux desktop environments, appeari
 
 ### 🖥️ Desktop Environment Integration
 
-| XFCE Settings | GNOME Notifications | KDE Plasma Dash |
-| :---: | :---: | :---: |
-| ![XFCE](screenshots/sc_003.png) | ![GNOME](screenshots/sc_004.png) | ![KDE](screenshots/sc_005.png) |
-| *XFCE System Category* | *Status Notifications* | *Application Dashboard* |
+| XFCE Settings | GNOME Notifications | KDE Plasma Dash | Application Menu |
+| :---: | :---: | :---: | :---: |
+| ![XFCE](screenshots/sc_003.png) | ![GNOME](screenshots/sc_004.png) | ![KDE](screenshots/sc_005.png) | ![Menu](screenshots/sc_006.png) |
+| *XFCE System Category* | *Status Notifications* | *Application Dashboard* | *System Menu Integration* |
 
 ---
 **Author:** Carlo Sitaro
