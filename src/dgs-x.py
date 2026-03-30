@@ -1,5 +1,5 @@
 # =================================================================
-# DGS-X - 1.2
+# DGS-X - 1.2 - STABLE RELEASE
 # =================================================================
 # Copyright (C) 2026 Carlo Sitaro
 # Licensed under GNU GPLv3
@@ -51,7 +51,6 @@ state = {
     "lt_clicked": False, "rt_clicked": False
 }
 
-# --- FIXED: SINGLE INSTANCE & REMOTE WAKEUP ---
 def manage_instance(gui_ptr):
     lock_port = 65432
     try:
@@ -73,7 +72,6 @@ def manage_instance(gui_ptr):
         except: pass
         sys.exit(0)
 
-# --- CORE DRIVER LOGIC (VERBATIM) ---
 def apply_accel(value):
     if abs(value) < settings["deadzone"]: return 0
     norm = (abs(value) - settings["deadzone"]) / (32767 - settings["deadzone"])
@@ -134,8 +132,18 @@ def input_listener(device, ui):
                         ui.write(e.EV_KEY, e.BTN_LEFT, 1 if is_p else 0)
                         state["rt_clicked"] = is_p
                         ui.syn()
-    except:
-        pass
+
+            elif event.type == e.EV_KEY:
+                if event.code == e.BTN_TL:  # LB -> Back
+                    ui.write(e.EV_KEY, e.KEY_BACK, event.value)
+                    ui.syn()
+                elif event.code == e.BTN_TR:  # RB -> Forward
+                    ui.write(e.EV_KEY, e.KEY_FORWARD, event.value)
+                    ui.syn()
+                elif event.code == e.BTN_THUMBR:  # R3 -> Middle Click
+                    ui.write(e.EV_KEY, e.BTN_MIDDLE, event.value)
+                    ui.syn()
+    except: pass
 
 def get_device():
     try:
@@ -154,43 +162,29 @@ class DGSXGui:
         self.root.withdraw()
         self.root.protocol("WM_DELETE_WINDOW", self.hide)
 
-        # STYLE ENGINE
         style = ttk.Style()
         style.theme_use('clam')
         
-        # Check for Dark Mode (simple background luminance check)
         bg_color = self.root.cget("background")
-        is_dark = True # Default to Dark for XFCE/Gaming setups
+        is_dark = True
         try:
-            # Attempt to detect if system is dark based on window background
             rgb = self.root.winfo_rgb(bg_color)
             if (rgb[0] + rgb[1] + rgb[2]) / 3 > 32767: is_dark = False
         except: pass
 
-        # Xbox Green & Palette
         xbox_green = "#107C10"
         bg_main = "#1e1e1e" if is_dark else "#f0f0f0"
         fg_main = "#ffffff" if is_dark else "#000000"
-        
         self.root.configure(bg=bg_main)
         
-        # Configure Styles
         style.configure("TFrame", background=bg_main)
         style.configure("TLabel", background=bg_main, foreground=fg_main)
         style.configure("TCheckbutton", background=bg_main, foreground=fg_main, font=('Helvetica', 10))
-        
-        # Accent: Xbox Green for Scale and Buttons
         style.configure("Horizontal.TScale", troughcolor="#333333" if is_dark else "#cccccc", background=bg_main)
-        style.map("TCheckbutton", 
-                  indicatorcolor=[('selected', xbox_green), ('!selected', '#555555')],
-                  background=[('active', bg_main)])
-        
+        style.map("TCheckbutton", indicatorcolor=[('selected', xbox_green), ('!selected', '#555555')], background=[('active', bg_main)])
         style.configure("TButton", padding=10, font=('Helvetica', 10, 'bold'))
-        style.map("TButton", 
-                  background=[('active', xbox_green), ('!active', '#333333' if is_dark else "#dddddd")],
-                  foreground=[('active', '#ffffff'), ('!active', fg_main)])
+        style.map("TButton", background=[('active', xbox_green), ('!active', '#333333' if is_dark else "#dddddd")], foreground=[('active', '#ffffff'), ('!active', fg_main)])
 
-        # GUI Layout
         f = ttk.Frame(self.root, padding="20")
         f.pack(fill="both", expand=True)
 
@@ -231,7 +225,6 @@ class DGSXGui:
         save_settings()
         messagebox.showinfo("DGS-X", "Settings saved!")
 
-# --- EXECUTION ---
 if __name__ == "__main__":
     load_settings()
     gui = DGSXGui()
@@ -242,7 +235,12 @@ if __name__ == "__main__":
         while not dev:
             dev = get_device()
             if not dev: time.sleep(5)
-        ui = UInput({e.EV_REL: (e.REL_X, e.REL_Y, e.REL_WHEEL), e.EV_KEY: (e.BTN_LEFT, e.BTN_RIGHT)}, name="DGS-X")
+        
+        ui = UInput({
+            e.EV_REL: (e.REL_X, e.REL_Y, e.REL_WHEEL), 
+            e.EV_KEY: (e.BTN_LEFT, e.BTN_RIGHT, e.BTN_MIDDLE, e.KEY_BACK, e.KEY_FORWARD)
+        }, name="DGS-X")
+        
         threading.Thread(target=move_loop, args=(ui,), daemon=True).start()
         input_listener(dev, ui)
 

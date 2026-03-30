@@ -24,7 +24,7 @@ ICON_DEST_DIR="$HOME/.local/share/icons/hicolor/64x64/apps"
 APPS_DIR="$HOME/.local/share/applications"
 
 echo "------------------------------------------"
-echo "🚀 Installing DGS-X 1.2.0 Stable (GUI Edition)"
+echo "🚀 Installing DGS-X 1.2 - STABLE RELEASE"
 echo "------------------------------------------"
 
 # 1. Distro Detection & Dependency Management
@@ -139,7 +139,7 @@ systemctl --user daemon-reload
 systemctl --user enable --now "$SERVICE_NAME"
 
 echo "------------------------------------------"
-echo "✅ DGS-X 1.2.0 Installation Complete!"
+echo "✅ DGS-X 1.2 Installation Complete!"
 echo "You can now find 'DGS-X Control Panel' in your applications menu."
 echo "Note: Log out and back in to apply group changes if this is the first install."
 echo "------------------------------------------"
