@@ -1,8 +1,7 @@
 #!/bin/bash
 
-# DGS-X - 1.2.0 Universal Installer
+# DGS-X - 1.3.0 Universal Installer
 # Targets: Arch, Debian/Ubuntu, openSUSE, Fedora
-# Integration: PySide6 GUI + Systemd User Service
 
 set -e
 
@@ -24,7 +23,7 @@ ICON_DEST_DIR="$HOME/.local/share/icons/hicolor/64x64/apps"
 APPS_DIR="$HOME/.local/share/applications"
 
 echo "------------------------------------------"
-echo "🚀 Installing DGS-X 1.2 - STABLE RELEASE"
+echo "🚀 Installing DGS-X 1.3 - STABLE RELEASE"
 echo "------------------------------------------"
 
 # 1. Distro Detection & Dependency Management
@@ -32,20 +31,25 @@ if [ -f /etc/os-release ]; then
     . /etc/os-release
 fi
 
-echo "Checking for system dependencies on $NAME..."
-case $ID in
-    fedora)
-        sudo dnf install -y python3-devel gcc qt6-qtbase-devel
+echo "Checking for system dependencies on ${NAME:-Linux}..."
+OS_CHECK="${ID}_${ID_LIKE}"
+
+case $OS_CHECK in
+    *fedora*)
+        sudo dnf install -y python3-devel gcc python3-tkinter
         ;;
-    opensuse-tumbleweed|opensuse-leap)
-        sudo zypper install -y python3-devel gcc qt6-base-devel
+    *opensuse*)
+        sudo zypper install -y python3-devel gcc python3-tk
         ;;
-    arch)
-        sudo pacman -S --needed --noconfirm python gcc qt6-base
+    *arch*)
+        sudo pacman -S --needed --noconfirm python gcc tk
         ;;
-    deb|ubuntu|debian)
+    *debian*|*ubuntu*)
         sudo apt-get update
-        sudo apt-get install -y python3-dev python3-venv build-essential libxcb-cursor0
+        sudo apt-get install -y python3-dev python3-venv python3-tk build-essential
+        ;;
+    *)
+        echo "⚠️ Unknown distribution. Ensure python3, tkinter, and gcc are installed."
         ;;
 esac
 
@@ -55,8 +59,7 @@ mkdir -p "$CONFIG_DIR"
 mkdir -p "$ICON_DEST_DIR"
 mkdir -p "$APPS_DIR"
 
-# 3. Copy Files
-# Assuming dgs-x.py is in the root or src/
+# 3. Copy Executables & Assets
 if [ -f "$PROJECT_ROOT/dgs-x.py" ]; then
     cp "$PROJECT_ROOT/dgs-x.py" "$INSTALL_DIR/"
 elif [ -f "$PROJECT_ROOT/src/dgs-x.py" ]; then
@@ -71,11 +74,11 @@ if [ -d "$PROJECT_ROOT/assets" ]; then
 fi
 chmod +x "$INSTALL_DIR/dgs-x.py"
 
-# 4. Setup Python Virtual Environment with GUI support
-echo "Setting up Virtual Environment and installing PySide6..."
+# 4. Setup Virtual Environment
+echo "Setting up Virtual Environment and Python dependencies..."
 python3 -m venv "$INSTALL_DIR/venv"
 "$INSTALL_DIR/venv/bin/pip" install --upgrade pip
-"$INSTALL_DIR/venv/bin/pip" install evdev PySide6
+"$INSTALL_DIR/venv/bin/pip" install evdev pillow pystray
 
 # 5. Register System Icon
 if [ -f "$INSTALL_DIR/assets/dgs-x_trayicon.png" ]; then
@@ -83,7 +86,7 @@ if [ -f "$INSTALL_DIR/assets/dgs-x_trayicon.png" ]; then
     gtk-update-icon-cache "$HOME/.local/share/icons/hicolor" 2>/dev/null || true
 fi
 
-# 6. Create Desktop Entry (The main way to interact with DGS-X)
+# 6. Create Desktop Entry
 echo "Generating desktop entry..."
 cat <<EOF > "$APPS_DIR/$REVERSE_ID.desktop"
 [Desktop Entry]
@@ -111,12 +114,12 @@ if [ -n "$UDEV_SRC" ]; then
 fi
 
 # 8. Group Membership
-if ! groups $USER | grep &>/dev/null "\binput\b"; then
+if ! id -nG "$USER" | grep -qw "input"; then
     echo "Adding user to 'input' group..."
-    sudo usermod -aG input $USER
+    sudo usermod -aG input "$USER"
 fi
 
-# 9. Create Systemd User Service (FIXED)
+# 9. Create Systemd User Service
 mkdir -p "$HOME/.config/systemd/user/"
 cat <<EOF > "$HOME/.config/systemd/user/$SERVICE_NAME"
 [Unit]
@@ -125,21 +128,20 @@ After=graphical-session.target udev.target
 
 [Service]
 Type=simple
-# Launch in background using the VENV
-ExecStart=$INSTALL_DIR/venv/bin/python3 $INSTALL_DIR/dgs-x.py --background
+Environment=DISPLAY=:0
+ExecStart=$INSTALL_DIR/venv/bin/python3 $INSTALL_DIR/dgs-x.py
 Restart=on-failure
-RestartSec=10
-ExecStartPre=/usr/bin/sleep 5
+RestartSec=5
 
 [Install]
-WantedBy=default.target
+WantedBy=graphical-session.target
 EOF
 
 systemctl --user daemon-reload
 systemctl --user enable --now "$SERVICE_NAME"
 
 echo "------------------------------------------"
-echo "✅ DGS-X 1.2 Installation Complete!"
-echo "You can now find 'DGS-X Control Panel' in your applications menu."
-echo "Note: Log out and back in to apply group changes if this is the first install."
+echo "✅ DGS-X 1.3 Installation Complete!"
+echo "Control Panel available in your applications menu."
+echo "Note: Log out and back in if 'input' group permissions were newly assigned."
 echo "------------------------------------------"

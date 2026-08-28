@@ -1,5 +1,5 @@
 # =================================================================
-# DGS-X - 1.2 - STABLE RELEASE
+# DGS-X - 1.3 - STABLE RELEASE
 # =================================================================
 # Copyright (C) 2026 Carlo Sitaro
 # Licensed under GNU GPLv3
@@ -21,6 +21,8 @@ import subprocess
 
 CONFIG_DIR = os.path.expanduser("~/.config/dgs-x")
 CONFIG_PATH = os.path.join(CONFIG_DIR, "config.json")
+AUTOSTART_DIR = os.path.expanduser("~/.config/autostart")
+AUTOSTART_FILE = os.path.join(AUTOSTART_DIR, "dgs-x.desktop")
 
 settings = {
     "mouse_sensitivity": 25,
@@ -45,10 +47,31 @@ def save_settings():
             json.dump(settings, f, indent=4)
     except: pass
 
+def is_autostart_enabled():
+    return os.path.exists(AUTOSTART_FILE)
+
+def set_autostart(enable):
+    if enable:
+        os.makedirs(AUTOSTART_DIR, exist_ok=True)
+        desktop_content = f"""[Desktop Entry]
+Type=Application
+Name=DGS-X
+Exec={sys.executable} {os.path.abspath(__file__)}
+Hidden=false
+NoDisplay=false
+X-GNOME-Autostart-enabled=true
+"""
+        with open(AUTOSTART_FILE, "w") as f:
+            f.write(desktop_content)
+    else:
+        if os.path.exists(AUTOSTART_FILE):
+            os.remove(AUTOSTART_FILE)
+
 state = {
     "rx": 0, "ry": 0, "lx": 0, "ly": 0,
     "active": True, "scroll_acc": 0.0,
-    "lt_clicked": False, "rt_clicked": False
+    "lt_clicked": False, "rt_clicked": False,
+    "hat_x": 0, "hat_y": 0
 }
 
 def manage_instance(gui_ptr):
@@ -132,16 +155,46 @@ def input_listener(device, ui):
                         ui.write(e.EV_KEY, e.BTN_LEFT, 1 if is_p else 0)
                         state["rt_clicked"] = is_p
                         ui.syn()
+                elif event.code == e.ABS_HAT0X:
+                    if state["hat_x"] != 0 and event.value == 0:
+                        key = e.KEY_LEFT if state["hat_x"] < 0 else e.KEY_RIGHT
+                        ui.write(e.EV_KEY, key, 0)
+                    elif event.value != 0:
+                        key = e.KEY_LEFT if event.value < 0 else e.KEY_RIGHT
+                        ui.write(e.EV_KEY, key, 1)
+                    state["hat_x"] = event.value
+                    ui.syn()
+                elif event.code == e.ABS_HAT0Y:
+                    if state["hat_y"] != 0 and event.value == 0:
+                        key = e.KEY_UP if state["hat_y"] < 0 else e.KEY_DOWN
+                        ui.write(e.EV_KEY, key, 0)
+                    elif event.value != 0:
+                        key = e.KEY_UP if event.value < 0 else e.KEY_DOWN
+                        ui.write(e.EV_KEY, key, 1)
+                    state["hat_y"] = event.value
+                    ui.syn()
 
             elif event.type == e.EV_KEY:
-                if event.code == e.BTN_TL:  # LB -> Back
+                if event.code == e.BTN_TL:
                     ui.write(e.EV_KEY, e.KEY_BACK, event.value)
                     ui.syn()
-                elif event.code == e.BTN_TR:  # RB -> Forward
+                elif event.code == e.BTN_TR:
                     ui.write(e.EV_KEY, e.KEY_FORWARD, event.value)
                     ui.syn()
-                elif event.code == e.BTN_THUMBR:  # R3 -> Middle Click
+                elif event.code == e.BTN_THUMBR:
                     ui.write(e.EV_KEY, e.BTN_MIDDLE, event.value)
+                    ui.syn()
+                elif event.code == e.BTN_DPAD_UP:
+                    ui.write(e.EV_KEY, e.KEY_UP, event.value)
+                    ui.syn()
+                elif event.code == e.BTN_DPAD_DOWN:
+                    ui.write(e.EV_KEY, e.KEY_DOWN, event.value)
+                    ui.syn()
+                elif event.code == e.BTN_DPAD_LEFT:
+                    ui.write(e.EV_KEY, e.KEY_LEFT, event.value)
+                    ui.syn()
+                elif event.code == e.BTN_DPAD_RIGHT:
+                    ui.write(e.EV_KEY, e.KEY_RIGHT, event.value)
                     ui.syn()
     except: pass
 
@@ -157,7 +210,7 @@ def get_device():
 class DGSXGui:
     def __init__(self):
         self.root = tk.Tk()
-        self.root.title("DGS-X v1.2 - Control Panel")
+        self.root.title("DGS-X v1.3 - Control Panel")
         self.root.geometry("480x620")
         self.root.withdraw()
         self.root.protocol("WM_DELETE_WINDOW", self.hide)
@@ -188,7 +241,7 @@ class DGSXGui:
         f = ttk.Frame(self.root, padding="20")
         f.pack(fill="both", expand=True)
 
-        self.start_v = tk.BooleanVar(value=True)
+        self.start_v = tk.BooleanVar(value=is_autostart_enabled())
         ttk.Checkbutton(f, text="Load DGS-X on startup", variable=self.start_v).pack(anchor="w", pady=(0, 20))
 
         ttk.Label(f, text="Left Stick: Scrolling Sensitivity", font=('Helvetica', 11, 'bold')).pack(anchor="w")
@@ -218,6 +271,7 @@ class DGSXGui:
         self.root.withdraw()
 
     def apply(self):
+        set_autostart(self.start_v.get())
         settings["mouse_sensitivity"] = int(self.m_s.get())
         settings["scroll_sensitivity"] = self.sc_s.get() / 100.0
         settings["ultra_precision_mode"] = self.u_v.get()
@@ -231,18 +285,26 @@ if __name__ == "__main__":
     _lock = manage_instance(gui)
 
     def start_driver():
-        dev = None
-        while not dev:
-            dev = get_device()
-            if not dev: time.sleep(5)
-        
-        ui = UInput({
-            e.EV_REL: (e.REL_X, e.REL_Y, e.REL_WHEEL), 
-            e.EV_KEY: (e.BTN_LEFT, e.BTN_RIGHT, e.BTN_MIDDLE, e.KEY_BACK, e.KEY_FORWARD)
-        }, name="DGS-X")
-        
-        threading.Thread(target=move_loop, args=(ui,), daemon=True).start()
-        input_listener(dev, ui)
+        while True:
+            dev = None
+            while not dev:
+                dev = get_device()
+                if not dev:
+                    time.sleep(3)
+            try:
+                ui = UInput({
+                    e.EV_REL: (e.REL_X, e.REL_Y, e.REL_WHEEL),
+                    e.EV_KEY: (e.BTN_LEFT, e.BTN_RIGHT, e.BTN_MIDDLE, e.KEY_BACK, e.KEY_FORWARD, e.KEY_UP, e.KEY_DOWN, e.KEY_LEFT, e.KEY_RIGHT)
+                }, name="DGS-X")
+                
+                subprocess.Popen(['notify-send', 'DGS-X', 'Controller Connected'])
+                
+                threading.Thread(target=move_loop, args=(ui,), daemon=True).start()
+                input_listener(dev, ui)
+            except Exception:
+                pass
+            finally:
+                time.sleep(2)
 
     threading.Thread(target=start_driver, daemon=True).start()
 

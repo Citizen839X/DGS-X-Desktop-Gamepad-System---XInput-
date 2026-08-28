@@ -1,38 +1,14 @@
 # DGS-X (Desktop Gamepad System - XInput)
-**Version 1.0 - Basic Release**
 
 DGS-X is a lightweight Linux utility designed to transform your XInput controller (specifically tested by myself on PDP Series S/X and original Xbox One S/X models) into a fully functional desktop navigation tool. It eliminates the need for a mouse by mapping common desktop actions directly to your gamepad. It is the ideal solution for anyone who wants to navigate the web with a comfortable Xbox controller—or compatible ones—straight from a comfy couch, right towards their favorite Linux Multimedia System.
 
-**Version 1.2 - Stable Release (what's new)**
+**Version 1.3 - Stable Release (what's new)**
 
-1. Hardened Service Lock: The 3-second **START** button toggle is now prioritized over all other inputs. Even if the mouse logic is locked, the driver remains responsive to the wake-up command.
+1. Added d-pad support in order to match directional arrows (keyboard)
 
-2. System Notifications: Added native desktop notifications via `notify-send` to confirm `ENABLED` or `LOCKED` status.
+2. Improved 99-dgs-x.rules structure
 
-3. Xbox-Inspired UI: Updated Control Panel (480x620) featuring **Xbox Green** (`#107C10`) accents and Helvetica 11 Bold typography.
-
-4. Adaptive Theme Engine: The GUI now auto-detects system luminance to match your GTK Light or Dark theme colors.
-
-5. Integrated Left Stick Options: Added **Invert Y-Axis (Reverse Scrolling)** and **Ultra-Precision Mode** directly under the Left Stick block for better logical grouping.
-
-### 🛠 Fixes & Internal Improvements
-* **Single Instance Protection**: Implemented a socket-based lock (port 65432) to prevent multiple driver instances and allow remote wakeup from the application menu.
-* **Dependency Fix**: Resolved a critical regression by properly importing `subprocess` for system calls.
-* **Input Clean-up**: Optimized the `evdev` loop to ensure zero-latency when switching between scrolling and cursor movement.
-
-**Version 1.1 - Stable Release (what's new)**
-
-1 - Brilliant Analog Scrolling: Introduced a new time-based scrolling engine (10ms polling). This provides a smooth, "viscous" feel that scales exponentially with stick displacement, moving away from discrete event triggers for a truly organic experience.
-
-2 - JSON Configuration Engine: Settings are now decoupled from the core logic and stored in ~/.config/dgs-x/config.json. This ensures user preferences (like scroll inversion) persist across updates and reboots for the upcoming Control Panel.
-
-3 - Expanded Hardware Compatibility: Improved device discovery logic to automatically support a wider range of third-party XInput controllers and generic game pads, particularly with the IDs titling "generic".
-
-4 - Performance Optimization: Mouse movement and scrolling logic are now synchronized within a high-priority independent thread, significantly reducing input latency.
-
-5 - Refined Constants: Pointer sensitivity is now locked at the "Gold Standard" of 25 for maximum precision, while scroll resolution has been increased for better web navigation.
-
----
+3. Installer fixes (improved compatibility for Debian/Ubuntu distro)
 
 ## 🚀 Installation
 
@@ -40,7 +16,7 @@ DGS-X includes a universal installer that handles dependencies, creates a Python
 
 1. **Clone the repository:**
    ```bash
-   git clone [https://github.com/Citizen839X/DGS-X-Desktop-Gamepad-System---XInput-.git](https://github.com/Citizen839X/DGS-X-Desktop-Gamepad-System---XInput-.git)
+git clone https://github.com/Citizen839X/DGS-X-Desktop-Gamepad-System---XInput-.git
    cd DGS-X-Desktop-Gamepad-System---XInput-
 
 2. **Grant execution permissions:**
@@ -56,15 +32,12 @@ DGS-X includes a universal installer that handles dependencies, creates a Python
 
 ## 🛠️ Requirements
 
-    Python 3.x
+* Python 3.x with Tkinter support
+* evdev, Pillow, pystray (installed automatically via venv)
+* XInput Controller (Xbox, PDP, Turtle Beach, or compatible)
+* systemd (for the auto-start service)
 
-    evdev (installed automatically via venv)
-
-    XInput Controller (Xbox, PDP, or compatible)
-
-    systemd (for the auto-start service)
-
-## 🎮 Default Key Mapping (v1.0)
+## 🎮 Default Key Mapping (v1.3)
 
 | Controller Input | Desktop Action |
 | :--- | :--- |
@@ -75,6 +48,8 @@ DGS-X includes a universal installer that handles dependencies, creates a Python
 | **Right Stick Click (R3)** | Mouse Middle Click (M3 / Wheel Click) |
 | **Left Bumper (LB)** | Navigation Back (File Manager / Browser) |
 | **Right Bumper (RB)** | Navigation Forward (File Manager / Browser) |
+| **Dpad** | Directional Navigation (Keyboard arrows) |
+| **Start** | Activate/Deactivate DGS-X (press&hold for 3-4 sec.) |
 
 ## 💡 Natural Feel Combos:
 
@@ -105,20 +80,13 @@ To prevent accidental inputs during gaming sessions or when away from the desk, 
 
 *A desktop notification via `notify-send` will confirm the status change (Xfce, GNOME and KDE tested).*
 
----
-
-## 🛠️ Intelligent Auto-Disable
-
-DGS-X is designed to coexist with Steam and other launchers. It automatically detects **Fullscreen** or **Borderless Fullscreen** applications and stays dormant to avoid conflicts with games or Steam Big Picture mode.
-
----
-
 ### Tested Hardware & IDs
 
 The following devices have been manually tested and verified for full compatibility:
 
-* **PDP Wired Controller for Xbox Series X/S** (ID `0e6f:02f3`) - *Developer's Choice*
-* **Microsoft Xbox Series S/X / One Controller** (ID `045e:02ea`) - *Standard Reference*
+* **Turtle Beach Xbox Rematch Core Wired Controller**
+* **PDP Wired Controller for Xbox Series X/S**
+* **Microsoft Xbox Series S/X / One Controller**
 * **Generic XInput Compatible Gamepads** (Generic Microsoft/Xbox drivers)
 
 > **Note on PDP Controllers:** While wired, these units offer superior durability feedback and were the main focus development target for DGS-X. However, you can use the original gamepad as well and the right stick sensitiveness basics may logically differ.
