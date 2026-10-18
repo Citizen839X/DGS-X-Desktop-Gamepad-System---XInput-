@@ -2,13 +2,15 @@
 
 DGS-X is a lightweight Linux utility designed to transform your XInput controller (specifically tested by myself on PDP Series S/X and original Xbox One S/X models) into a fully functional desktop navigation tool. It eliminates the need for a mouse by mapping common desktop actions directly to your gamepad. It is the ideal solution for anyone who wants to navigate the web with a comfortable Xbox controller—or compatible ones—straight from a comfy couch, right towards their favorite Linux Multimedia System.
 
-**Version 1.3 - Stable Release (what's new)**
+**Version 1.3.1 - Stable Release (what's new)**
 
-1. Added d-pad support in order to match directional arrows (keyboard)
+1. **Event-Driven Hotplugging**: Migrated from fixed-interval polling loops to `pyudev` for instant detection of gamepads when connected or disconnected.
 
-2. Improved 99-dgs-x.rules structure
+2. **GNOME Startup Resilience**: Implemented robust exception handling for `pystray` to completely prevent background service crashes during desktop environment initialization.
 
-3. Installer fixes (improved compatibility for Debian/Ubuntu distro)
+3. **OpenSUSE Tumbleweed / Kernel Quirk Note**: Licensed wired Xbox controllers (such as the Turtle Beach Rematch) may occasionally experience an `xpad` firmware handshake failure at boot, leaving the controller LED off. If the device is not recognized automatically after a system reboot, quickly reset the kernel module with:
+  ```bash
+  sudo modprobe -r xpad && sudo modprobe xpad
 
 ## 🚀 Installation
 
@@ -37,7 +39,7 @@ git clone https://github.com/Citizen839X/DGS-X-Desktop-Gamepad-System---XInput-.
 * XInput Controller (Xbox, PDP, Turtle Beach, or compatible)
 * systemd (for the auto-start service)
 
-## 🎮 Default Key Mapping (v1.3)
+## 🎮 Default Key Mapping (v1.3.1)
 
 | Controller Input | Desktop Action |
 | :--- | :--- |
@@ -111,4 +113,5 @@ DGS-X integrates seamlessly across different Linux desktop environments, appeari
 
 ---
 **Author:** Carlo Sitaro
+
 **License:** GNU GPLv3

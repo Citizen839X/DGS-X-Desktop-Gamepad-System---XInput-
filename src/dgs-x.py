@@ -1,5 +1,5 @@
 # =================================================================
-# DGS-X - 1.3 - STABLE RELEASE
+# DGS-X - 1.3.1 - STABLE RELEASE
 # =================================================================
 # Copyright (C) 2026 Carlo Sitaro
 # Licensed under GNU GPLv3
@@ -18,6 +18,7 @@ from tkinter import ttk, messagebox
 from PIL import Image, ImageDraw
 import pystray
 import subprocess
+import pyudev
 
 CONFIG_DIR = os.path.expanduser("~/.config/dgs-x")
 CONFIG_PATH = os.path.join(CONFIG_DIR, "config.json")
@@ -207,10 +208,43 @@ def get_device():
     except: pass
     return None
 
+def check_and_reload_xpad():
+    try:
+        with open("/proc/modules", "r") as f:
+            modules = f.read()
+        if "xpad" not in modules:
+            subprocess.run(["modprobe", "xpad"], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+    except:
+        pass
+
+def wait_for_device():
+    check_and_reload_xpad()
+    dev = get_device()
+    if dev:
+        return dev
+    try:
+        context = pyudev.Context()
+        monitor = pyudev.Monitor.from_context(context)
+        monitor.filter_by(subsystem='input')
+        for device in iter(monitor.poll, None):
+            if device.action in ('add', 'change'):
+                dev_path = device.device_node
+                if dev_path:
+                    try:
+                        d = evdev.InputDevice(dev_path)
+                        if any(x in d.name.lower() for x in ["xbox", "pdp", "x-box", "generic", "controller", "gamepad"]):
+                            return d
+                    except:
+                        pass
+    except:
+        pass
+    time.sleep(2)
+    return None
+
 class DGSXGui:
     def __init__(self):
         self.root = tk.Tk()
-        self.root.title("DGS-X v1.3 - Control Panel")
+        self.root.title("DGS-X v1.3.1 - Control Panel")
         self.root.geometry("480x620")
         self.root.withdraw()
         self.root.protocol("WM_DELETE_WINDOW", self.hide)
@@ -288,9 +322,7 @@ if __name__ == "__main__":
         while True:
             dev = None
             while not dev:
-                dev = get_device()
-                if not dev:
-                    time.sleep(3)
+                dev = wait_for_device()
             try:
                 ui = UInput({
                     e.EV_REL: (e.REL_X, e.REL_Y, e.REL_WHEEL),
@@ -312,10 +344,13 @@ if __name__ == "__main__":
         img = Image.new('RGB', (64, 64), (45, 45, 45))
         draw = ImageDraw.Draw(img)
         draw.ellipse((16, 16, 48, 48), fill=(0, 255, 127))
-        pystray.Icon("DGS-X", img, "DGS-X", menu=pystray.Menu(
-            pystray.MenuItem("Settings", lambda: gui.show()),
-            pystray.MenuItem("Exit", lambda: os._exit(0))
-        )).run()
+        try:
+            pystray.Icon("DGS-X", img, "DGS-X", menu=pystray.Menu(
+                pystray.MenuItem("Settings", lambda: gui.show()),
+                pystray.MenuItem("Exit", lambda: os._exit(0))
+            )).run()
+        except Exception as e:
+            print(f"Warning: tray icon unavailable, background service still active: {e}")
 
     threading.Thread(target=run_tray, daemon=True).start()
     gui.root.mainloop()

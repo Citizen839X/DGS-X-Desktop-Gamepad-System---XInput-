@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# DGS-X - 1.3.0 Universal Installer
+# DGS-X - 1.3.1 Universal Installer
 # Targets: Arch, Debian/Ubuntu, openSUSE, Fedora
 
 set -e
@@ -23,7 +23,7 @@ ICON_DEST_DIR="$HOME/.local/share/icons/hicolor/64x64/apps"
 APPS_DIR="$HOME/.local/share/applications"
 
 echo "------------------------------------------"
-echo "🚀 Installing DGS-X 1.3 - STABLE RELEASE"
+echo "🚀 Installing DGS-X 1.3.1 - STABLE RELEASE"
 echo "------------------------------------------"
 
 # 1. Distro Detection & Dependency Management
@@ -141,7 +141,7 @@ systemctl --user daemon-reload
 systemctl --user enable --now "$SERVICE_NAME"
 
 echo "------------------------------------------"
-echo "✅ DGS-X 1.3 Installation Complete!"
+echo "✅ DGS-X 1.3.1 Installation Complete!"
 echo "Control Panel available in your applications menu."
 echo "Note: Log out and back in if 'input' group permissions were newly assigned."
 echo "------------------------------------------"
