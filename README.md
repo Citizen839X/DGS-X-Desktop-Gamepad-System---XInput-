@@ -1,16 +1,11 @@
-# DGS-X (Desktop Gamepad System - XInput)
+## Version 1.3.1 - Stable Release (What's New)
 
-DGS-X is a lightweight Linux utility designed to transform your XInput controller (specifically tested by myself on PDP Series S/X and original Xbox One S/X models) into a fully functional desktop navigation tool. It eliminates the need for a mouse by mapping common desktop actions directly to your gamepad. It is the ideal solution for anyone who wants to navigate the web with a comfortable Xbox controller—or compatible ones—straight from a comfy couch, right towards their favorite Linux Multimedia System.
-
-**Version 1.3.1 - Stable Release (what's new)**
-
-1. **Event-Driven Hotplugging**: Migrated from fixed-interval polling loops to `pyudev` for instant detection of gamepads when connected or disconnected.
-
-2. **GNOME Startup Resilience**: Implemented robust exception handling for `pystray` to completely prevent background service crashes during desktop environment initialization.
-
-3. **OpenSUSE Tumbleweed / Kernel Quirk Note**: Licensed wired Xbox controllers (such as the Turtle Beach Rematch) may occasionally experience an `xpad` firmware handshake failure at boot, leaving the controller LED off. If the device is not recognized automatically after a system reboot, quickly reset the kernel module with:
+- **Event-Driven Hotplugging**: Migrated from fixed-interval polling loops to `pyudev` for instant detection of gamepads when connected or disconnected.
+- **GNOME Startup Resilience**: Implemented robust exception handling for `pystray` to completely prevent background service crashes during desktop environment initialization.
+- **OpenSUSE Tumbleweed / Kernel Quirk Note**: Licensed wired Xbox controllers (such as the Turtle Beach Rematch) may occasionally experience an `xpad` firmware handshake failure at boot, leaving the controller LED off. If the device is not recognized automatically after a system reboot, quickly reset the kernel module with:
   ```bash
   sudo modprobe -r xpad && sudo modprobe xpad
+  ```
 
 ## 🚀 Installation
 
@@ -18,24 +13,27 @@ DGS-X includes a universal installer that handles dependencies, creates a Python
 
 1. **Clone the repository:**
    ```bash
-git clone https://github.com/Citizen839X/DGS-X-Desktop-Gamepad-System---XInput-.git
+   git clone https://github.com/Citizen839X/DGS-X-Desktop-Gamepad-System---XInput-.git
    cd DGS-X-Desktop-Gamepad-System---XInput-
+   ```
 
 2. **Grant execution permissions:**
-    ```bash
-    chmod +x install.sh
+   ```bash
+   chmod +x install.sh
+   ```
 
 3. **Run the installer:**
-    ```bash
-    ./install.sh
+   ```bash
+   ./install.sh
+   ```
 
 4. **Reload your session:**
-    Log out and log back in (or run newgrp input) to apply the necessary UDEV permissions for your controller.
+   Log out and log back in (or run `newgrp input`) to apply the necessary UDEV permissions for your controller.
 
 ## 🛠️ Requirements
 
 * Python 3.x with Tkinter support
-* evdev, Pillow, pystray (installed automatically via venv)
+* `evdev`, `Pillow`, `pystray` (installed automatically via venv)
 * XInput Controller (Xbox, PDP, Turtle Beach, or compatible)
 * systemd (for the auto-start service)
 
