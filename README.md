@@ -2,7 +2,7 @@
 
 * **Official Gentoo Linux Support**: The universal installer script now natively handles Gentoo dependency resolution, checking for Tkinter availability and automatically managing Portage USE flags (`dev-lang/python [tk]`).
 * **Enhanced Multi-Distro Installation**: Refined system package checks for Arch, openSUSE, Fedora, Debian/Ubuntu, and Gentoo.
-* **Installer Robustness & Refinement**: All installation phases (virtual environment setup, udev
+* **Installer Robustness & Refinement**: All installation phases (virtual environment setup, udev rules deployment, systemd user service registration) have been streamlined for smoother cross-distribution execution.
 - **OpenSUSE Tumbleweed / Kernel Quirk Note**: Licensed wired Xbox controllers (such as the Turtle Beach Rematch) may occasionally experience an `xpad` firmware handshake failure at boot, leaving the controller LED off. If the device is not recognized automatically after a system reboot, quickly reset the kernel module with:
   ```bash
   sudo modprobe -r xpad && sudo modprobe xpad
