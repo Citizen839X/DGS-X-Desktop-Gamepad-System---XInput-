@@ -38,7 +38,7 @@ DGS-X includes a universal installer that handles dependencies, creates a Python
 * XInput Controller (Xbox, PDP, Turtle Beach, or compatible)
 * systemd (for the auto-start service)
 
-## 🎮 Default Key Mapping (v1.3.1)
+## 🎮 Default Key Mapping
 
 | Controller Input | Desktop Action |
 | :--- | :--- |
