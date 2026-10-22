@@ -1,7 +1,8 @@
-## Version 1.3.1 - Stable Release (What's New)
+## Version 1.3.5 - Stable Release (What's New)
 
-- **Event-Driven Hotplugging**: Migrated from fixed-interval polling loops to `pyudev` for instant detection of gamepads when connected or disconnected.
-- **GNOME Startup Resilience**: Implemented robust exception handling for `pystray` to completely prevent background service crashes during desktop environment initialization.
+* **Official Gentoo Linux Support**: The universal installer script now natively handles Gentoo dependency resolution, checking for Tkinter availability and automatically managing Portage USE flags (`dev-lang/python [tk]`).
+* **Enhanced Multi-Distro Installation**: Refined system package checks for Arch, openSUSE, Fedora, Debian/Ubuntu, and Gentoo.
+* **Installer Robustness & Refinement**: All installation phases (virtual environment setup, udev
 - **OpenSUSE Tumbleweed / Kernel Quirk Note**: Licensed wired Xbox controllers (such as the Turtle Beach Rematch) may occasionally experience an `xpad` firmware handshake failure at boot, leaving the controller LED off. If the device is not recognized automatically after a system reboot, quickly reset the kernel module with:
   ```bash
   sudo modprobe -r xpad && sudo modprobe xpad

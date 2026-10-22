@@ -1,5 +1,5 @@
 # =================================================================
-# DGS-X - 1.3.1 - STABLE RELEASE
+# DGS-X - 1.3.5 - STABLE RELEASE
 # =================================================================
 # Copyright (C) 2026 Carlo Sitaro
 # Licensed under GNU GPLv3
@@ -244,7 +244,7 @@ def wait_for_device():
 class DGSXGui:
     def __init__(self):
         self.root = tk.Tk()
-        self.root.title("DGS-X v1.3.1 - Control Panel")
+        self.root.title("DGS-X v1.3.5 - Control Panel")
         self.root.geometry("480x620")
         self.root.withdraw()
         self.root.protocol("WM_DELETE_WINDOW", self.hide)

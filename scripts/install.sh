@@ -1,7 +1,7 @@
 #!/bin/bash
 
-# DGS-X - 1.3.1 Universal Installer
-# Targets: Arch, Debian/Ubuntu, openSUSE, Fedora
+# DGS-X - 1.3.5 Universal Installer
+# Targets: Arch, Debian/Ubuntu, openSUSE, Fedora, Gentoo
 
 set -e
 
@@ -23,7 +23,7 @@ ICON_DEST_DIR="$HOME/.local/share/icons/hicolor/64x64/apps"
 APPS_DIR="$HOME/.local/share/applications"
 
 echo "------------------------------------------"
-echo "🚀 Installing DGS-X 1.3.1 - STABLE RELEASE"
+echo "🚀 Installing DGS-X 1.3.5 - STABLE RELEASE"
 echo "------------------------------------------"
 
 # 1. Distro Detection & Dependency Management
@@ -47,6 +47,29 @@ case $OS_CHECK in
     *debian*|*ubuntu*)
         sudo apt-get update
         sudo apt-get install -y python3-dev python3-venv python3-tk build-essential
+        ;;
+    *gentoo*)
+        echo "🔍 Checking dependencies for Gentoo Linux..."
+        
+        # Ensure compiler and build essentials are present
+        if ! command -v gcc &> /dev/null; then
+            echo "📦 Installing sys-devel/gcc..."
+            sudo emerge --noreplace sys-devel/gcc
+        fi
+
+        # Check for Python Tkinter support (handled via 'tk' USE flag in Gentoo)
+        if ! python3 -c "import tkinter" &> /dev/null; then
+            echo "⚠️  Tkinter support is missing in Python."
+            echo "👉 Enabling 'tk' USE flag for dev-lang/python..."
+            
+            sudo mkdir -p /etc/portage/package.use
+            echo "dev-lang/python tk" | sudo tee -a /etc/portage/package.use/dgs-x > /dev/null
+            
+            echo "⚙️ Recompiling Python with Tkinter support..."
+            sudo emerge --oneshot dev-lang/python
+        else
+            echo "✅ Tkinter support is already enabled."
+        fi
         ;;
     *)
         echo "⚠️ Unknown distribution. Ensure python3, tkinter, and gcc are installed."
@@ -141,7 +164,7 @@ systemctl --user daemon-reload
 systemctl --user enable --now "$SERVICE_NAME"
 
 echo "------------------------------------------"
-echo "✅ DGS-X 1.3.1 Installation Complete!"
+echo "✅ DGS-X 1.3.5 Installation Complete!"
 echo "Control Panel available in your applications menu."
 echo "Note: Log out and back in if 'input' group permissions were newly assigned."
 echo "------------------------------------------"
